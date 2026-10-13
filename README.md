@@ -15,7 +15,6 @@ resultados/
   etapa1_2/         Figuras 1 y 2
   etapa3/           Tabla CSV y figuras/ (Figuras 3 a 22)
   etapa4/           Tablas CSV y figuras/ (Figuras 23 a 47)
-CONTEXTO_PARA_COMPANERO.txt   Notas de trabajo y pasos pendientes
 ```
 
 Las etapas 5 y 6 todavía no están hechas.
