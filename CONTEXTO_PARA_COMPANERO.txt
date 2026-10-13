@@ -5,8 +5,16 @@ ESTADO ACTUAL
 -------------
 El repositorio ya contiene:
 - Señales.py: parametros y señales base de las etapas 1 y 2.
-- Test_plot.py: figuras iniciales de señales periodicas y aperiodicas.
-- fig1_periodicas.pdf y fig2_aperiodicas.pdf: figuras vectoriales.
+- etapa1_2.py (antes Test_plot.py): figuras iniciales de señales periodicas
+  y aperiodicas.
+- resultados/etapa1_2/fig01_periodicas.pdf y fig02_aperiodicas.pdf: figuras
+  vectoriales.
+
+ORGANIZACION DE CARPETAS
+------------------------
+Los scripts quedan en la raiz (uno por etapa) y todo lo que generan va a
+resultados/etapaN/: las tablas CSV directamente y las figuras en figuras/.
+El archivo README.md resume la estructura y como ejecutar cada etapa.
 
 La base de trabajo usa:
 - fs = 1000 Hz
@@ -24,21 +32,38 @@ LO QUE SE AGREGÓ PARA LA ETAPA 3
 1. etapa3.py
    - Importa las señales desde Señales.py.
    - Calcula las 20 combinaciones: 4 entradas periodicas x 5 respuestas.
-   - Genera un PDF vectorial por combinacion en figuras_etapa3/.
+   - Genera un PDF vectorial por combinacion en resultados/etapa3/figuras/.
    - Calcula energia y potencia de entrada y salida.
-   - Verifica linealidad por superposicion.
-   - Verifica invariancia temporal desplazando la entrada 37 muestras.
+   - Verifica aditividad, homogeneidad e invariancia temporal (entrada
+     desplazada 37 muestras) con el error maximo absoluto.
+   - Se puede importar desde otras etapas sin que se ejecute (usa main()).
 
-2. resultados_etapa3.csv
+   Revision posterior (cambios respecto de la primera version):
+   - La potencia de salida ya no se divide por los 6 s completos. Se calcula
+     en una ventana de periodos enteros (funcion power_window):
+       * regimen permanente, donde h se solapa por completo con la entrada:
+         exponenciales [0,999; 1,999) s e impulso [0; 2) s;
+       * transitoria para escalon [0; 2) s y sinc [0,999; 1,999) s, porque
+         esas h duran mas que la entrada y no existe regimen permanente.
+   - valid_range identifica las muestras de salida afectadas por truncar
+     h(t): escalon desde t = 3 s; sinc antes de t = 1 s y desde t = 3 s.
+     energia_salida_valida excluye esos tramos.
+
+2. resultados/etapa3/resultados_etapa3.csv
    - Contiene 20 filas.
    - Columnas:
-     entrada, respuesta, energia_entrada, potencia_entrada,
-     energia_salida, potencia_salida, error_linealidad,
-     error_invariancia.
+     figura, entrada, respuesta, energia_entrada, potencia_entrada,
+     energia_salida, energia_salida_valida, potencia_salida,
+     ventana_inicio_s, ventana_fin_s, tipo_ventana, error_aditividad,
+     error_homogeneidad, error_invariancia.
 
-3. figuras_etapa3/
-   - Contiene 20 archivos PDF vectoriales.
-   - Cada archivo muestra entrada, respuesta a impulso y salida.
+3. resultados/etapa3/figuras/
+   - Contiene 20 archivos PDF vectoriales, numerados como Figura 3 a 22
+     (las figuras 1 y 2 son las de etapa1_2.py) y con nombres sin tildes:
+     figNN_entrada_respuesta.pdf.
+   - Cada archivo muestra entrada, respuesta a impulso y salida con el mismo
+     eje de tiempo, y marca la ventana de potencia y las zonas afectadas por
+     el truncamiento.
 
 VALIDACION REALIZADA
 --------------------
@@ -46,34 +71,36 @@ Ejecutando:
     python etapa3.py
 
 Se obtienen las 20 convoluciones y la tabla CSV.
-Error maximo de linealidad: aproximadamente 3,98e-16.
-Error maximo de invariancia temporal: aproximadamente 1,48e-16.
-Estos errores son numericamente despreciables.
+Errores maximos de aditividad, homogeneidad e invariancia temporal: del
+orden de 1e-16 (ruido de redondeo; el valor exacto cambia entre maquinas).
+x * delta = x con error maximo 1,1e-16.
+Senoidal en regimen: la amplitud coincide con |H(j w0)| y la potencia con
+0,5 |H(j w0)|^2 (0,001258 exp. decreciente; 0,009280 exp. creciente).
 
-COMO CONTINUAR: ETAPA 4
------------------------
-Implementar un script etapa4.py que use las mismas señales y estudie:
+ETAPA 4 (HECHA)
+---------------
+etapa4.py importa las funciones de etapa3.py y estudia:
 
-1. Escalamiento:
-   - Probar h_escalada(t) = c*h(t), por ejemplo c=0,5 y c=2.
-   - Comparar y_escalada(t) con y(t).
-   - Verificar que y_escalada = c*y.
-   - Explicar que la amplitud, energia y potencia cambian:
-       E(cy) = c^2 E(y)
-       P(cy) = c^2 P(y)
+1. Escalamiento h2(t) = a*h(t), con a = 2, 0,5 y -1.
+   - y2 = a*y con error maximo 0 en los 60 casos.
+   - Energia y potencia quedan multiplicadas por a^2 (4; 0,25; 1).
 
-2. Desplazamiento temporal:
-   - Probar h_desplazada(t) = h(t-t0), por ejemplo t0=0,25 s.
-   - Ajustar correctamente el eje temporal de la respuesta desplazada.
-   - Comparar la salida con la salida original desplazada.
-   - Explicar que el desplazamiento cambia la posicion temporal del resultado,
-     pero no su forma ni su energia ideal.
+2. Corrimiento h3(t) = h(t - t0), con t0 = 0,1 s y 0,25 s (= T0/2).
+   - y3(t) = y(t - t0) con error maximo 3,3e-16 en la zona no afectada por
+     el truncamiento de h(t); la potencia no cambia en ninguno de los 40
+     casos (la ventana de potencia se mueve junto con la salida).
+   - En escalon y sinc el error sobre todo el vector es grande (0,07 a
+     0,25) porque la ventana t_h es fija y al desplazar h cambia el tramo
+     truncado. Solo la energia total de la sinc cambia levemente.
+   - Con t0 = T0/2 la salida en regimen se invierte para senoidal, cuadrada
+     y triangular (simetria de media onda), pero no para el diente de sierra.
 
-3. Para cada prueba generar PDF vectorial con:
-   - h original y h modificada.
-   - salida original y salida modificada.
-   - ejes con unidades, titulo, leyenda y cuadricula.
-   - tabla CSV con energias, potencias y factores de comparacion.
+3. Salidas en resultados/etapa4/:
+   - resultados_etapa4_escalamiento.csv (60 filas)
+   - resultados_etapa4_corrimiento.csv (40 filas)
+   - resumen_etapa4.csv (20 filas: E y P original y modificadas)
+   - figuras/: Figuras 23 a 47, con la senoidal como entrada. Para graficar
+     las demas entradas, agregar sus nombres a FIGURE_INPUTS en etapa4.py.
 
 COMO CONTINUAR: ETAPA 5
 -----------------------
@@ -113,8 +140,8 @@ Preparar el analisis general:
 
 ORDEN RECOMENDADO DE TRABAJO
 ----------------------------
-1. Ejecutar y revisar etapa3.py y sus PDFs.
-2. Crear y validar etapa4.py.
+1. Ejecutar y revisar etapa3.py y sus PDFs. (hecho)
+2. Crear y validar etapa4.py. (hecho)
 3. Crear y validar etapa5.py.
 4. Completar el analisis de etapa6.
 5. Recién después integrar resultados, tablas y figuras en el informe final.
@@ -122,7 +149,9 @@ ORDEN RECOMENDADO DE TRABAJO
 COMANDO DE EJECUCION
 --------------------
 Desde la carpeta del repositorio:
+    python etapa1_2.py
     python etapa3.py
+    python etapa4.py
 
 No cambiar fs, dt, t_x, t_h ni la convencion *dt sin avisar, porque todos
 los resultados y futuras etapas deben ser comparables.
