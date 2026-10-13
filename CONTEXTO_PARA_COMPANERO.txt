@@ -1,0 +1,128 @@
+CONTEXTO DE TRABAJO - LABORATORIO 2: SISTEMAS LTI Y CONVOLUCION
+Repositorio: https://github.com/JeremiasQZ/Se-ales_02
+
+ESTADO ACTUAL
+-------------
+El repositorio ya contiene:
+- Señales.py: parametros y señales base de las etapas 1 y 2.
+- Test_plot.py: figuras iniciales de señales periodicas y aperiodicas.
+- fig1_periodicas.pdf y fig2_aperiodicas.pdf: figuras vectoriales.
+
+La base de trabajo usa:
+- fs = 1000 Hz
+- dt = 1/fs = 0,001 s
+- f0 = 2 Hz
+- entradas periodicas en t_x = np.arange(0, 2, dt)
+- respuestas aperiodicas en t_h = np.arange(-1, 3, dt)
+- convolucion continua aproximada como np.convolve(x, h) * dt
+- eje de salida: t_y = t_x[0] + t_h[0] + np.arange(len(y))*dt
+- energia: E = sum(abs(z)**2) * dt
+- potencia media: P = E / duracion
+
+LO QUE SE AGREGÓ PARA LA ETAPA 3
+--------------------------------
+1. etapa3.py
+   - Importa las señales desde Señales.py.
+   - Calcula las 20 combinaciones: 4 entradas periodicas x 5 respuestas.
+   - Genera un PDF vectorial por combinacion en figuras_etapa3/.
+   - Calcula energia y potencia de entrada y salida.
+   - Verifica linealidad por superposicion.
+   - Verifica invariancia temporal desplazando la entrada 37 muestras.
+
+2. resultados_etapa3.csv
+   - Contiene 20 filas.
+   - Columnas:
+     entrada, respuesta, energia_entrada, potencia_entrada,
+     energia_salida, potencia_salida, error_linealidad,
+     error_invariancia.
+
+3. figuras_etapa3/
+   - Contiene 20 archivos PDF vectoriales.
+   - Cada archivo muestra entrada, respuesta a impulso y salida.
+
+VALIDACION REALIZADA
+--------------------
+Ejecutando:
+    python etapa3.py
+
+Se obtienen las 20 convoluciones y la tabla CSV.
+Error maximo de linealidad: aproximadamente 3,98e-16.
+Error maximo de invariancia temporal: aproximadamente 1,48e-16.
+Estos errores son numericamente despreciables.
+
+COMO CONTINUAR: ETAPA 4
+-----------------------
+Implementar un script etapa4.py que use las mismas señales y estudie:
+
+1. Escalamiento:
+   - Probar h_escalada(t) = c*h(t), por ejemplo c=0,5 y c=2.
+   - Comparar y_escalada(t) con y(t).
+   - Verificar que y_escalada = c*y.
+   - Explicar que la amplitud, energia y potencia cambian:
+       E(cy) = c^2 E(y)
+       P(cy) = c^2 P(y)
+
+2. Desplazamiento temporal:
+   - Probar h_desplazada(t) = h(t-t0), por ejemplo t0=0,25 s.
+   - Ajustar correctamente el eje temporal de la respuesta desplazada.
+   - Comparar la salida con la salida original desplazada.
+   - Explicar que el desplazamiento cambia la posicion temporal del resultado,
+     pero no su forma ni su energia ideal.
+
+3. Para cada prueba generar PDF vectorial con:
+   - h original y h modificada.
+   - salida original y salida modificada.
+   - ejes con unidades, titulo, leyenda y cuadricula.
+   - tabla CSV con energias, potencias y factores de comparacion.
+
+COMO CONTINUAR: ETAPA 5
+-----------------------
+Realizar cinco combinaciones entre señales aperiodicas intercambiando
+entrada y respuesta a impulso. La finalidad es comprobar conmutatividad:
+
+    x(t) * h(t) = h(t) * x(t)
+
+Importante:
+- Usar los vectores aperiodicos de Señales.py.
+- Aplicar *dt en ambas convoluciones.
+- Usar el mismo eje temporal para comparar ambas salidas.
+- Comparar la norma del error relativo.
+- Graficar x*h y h*x en PDFs vectoriales.
+- Calcular energia y potencia de ambas salidas.
+- Explicar que la igualdad teorica puede mostrar pequeñas diferencias
+  numericas, pero deben ser despreciables.
+
+Se sugieren estas cinco parejas:
+1. Exp. decreciente con Exp. creciente
+2. Exp. decreciente con Escalon
+3. Exp. creciente con Sinc
+4. Impulso con Sinc
+5. Escalon con Sinc
+
+COMO CONTINUAR: ETAPA 6
+-----------------------
+Preparar el analisis general:
+- Efecto de cada respuesta a impulso sobre las entradas.
+- Efecto del escalamiento en amplitud, energia y potencia.
+- Efecto del desplazamiento temporal.
+- Verificacion de conmutatividad.
+- Diferencia entre señales ideales e implementacion con ventanas finitas.
+- Transitorios de inicio y termino de las convoluciones.
+- Efecto de truncar el escalon a 3 segundos.
+- Aproximacion del impulso mediante una muestra de altura 1/dt.
+
+ORDEN RECOMENDADO DE TRABAJO
+----------------------------
+1. Ejecutar y revisar etapa3.py y sus PDFs.
+2. Crear y validar etapa4.py.
+3. Crear y validar etapa5.py.
+4. Completar el analisis de etapa6.
+5. Recién después integrar resultados, tablas y figuras en el informe final.
+
+COMANDO DE EJECUCION
+--------------------
+Desde la carpeta del repositorio:
+    python etapa3.py
+
+No cambiar fs, dt, t_x, t_h ni la convencion *dt sin avisar, porque todos
+los resultados y futuras etapas deben ser comparables.
