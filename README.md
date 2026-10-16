@@ -11,13 +11,17 @@ Señales.py          Etapas 1 y 2: parámetros y definición de las señales
 etapa1_2.py         Etapas 1 y 2: gráficos de las señales
 etapa3.py           Etapa 3: convolución de las 4 entradas con las 5 respuestas
 etapa4.py           Etapa 4: escalamiento y corrimiento de las respuestas
+etapa5.py           Etapa 5: conmutatividad con señales aperiódicas
+etapa6.py           Etapa 6: respuesta en frecuencia, como apoyo al análisis
 resultados/
   etapa1_2/         Figuras 1 y 2
   etapa3/           Tabla CSV y figuras/ (Figuras 3 a 22)
   etapa4/           Tablas CSV y figuras/ (Figuras 23 a 47)
+  etapa5/           Tabla CSV y figuras/ (Figuras 48 a 52)
+  etapa6/           Figura 53, tabla CSV y analisis_resultados.md
 ```
 
-Las etapas 5 y 6 todavía no están hechas.
+El texto del análisis (etapa 6) está en `resultados/etapa6/analisis_resultados.md`.
 
 ## Cómo ejecutar
 
@@ -27,11 +31,13 @@ Requiere Python 3 con `numpy`, `scipy` y `matplotlib`. Desde la raíz del reposi
 python etapa1_2.py
 python etapa3.py
 python etapa4.py
+python etapa5.py
+python etapa6.py
 ```
 
 Cada script vuelve a generar sus figuras y tablas en `resultados/`. Los scripts
-se pueden ejecutar en cualquier orden; `etapa4.py` reutiliza funciones de
-`etapa3.py`, pero no necesita que se haya ejecutado antes.
+se pueden ejecutar en cualquier orden; `etapa4.py` y `etapa5.py` reutilizan
+funciones de `etapa3.py`, pero no necesitan que se haya ejecutado antes.
 
 ## Qué hace cada etapa
 
@@ -40,6 +46,8 @@ se pueden ejecutar en cualquier orden; `etapa4.py` reutiliza funciones de
 | 1 y 2 | `Señales.py`, `etapa1_2.py` | Cuatro señales periódicas (senoidal, cuadrada, triangular, diente de sierra) y cinco aperiódicas (exponencial decreciente, exponencial creciente, impulso, escalón, sinc) | `fig01_periodicas.pdf`, `fig02_aperiodicas.pdf` |
 | 3 | `etapa3.py` | Las 20 convoluciones, energía y potencia de entrada y salida, y verificación numérica de aditividad, homogeneidad e invariancia en el tiempo | `resultados_etapa3.csv` y 20 figuras |
 | 4 | `etapa4.py` | Efecto de `a·h(t)` con a = 2, 0,5 y −1, y de `h(t − t0)` con t0 = 0,1 s y 0,25 s | Tres tablas CSV y 25 figuras |
+| 5 | `etapa5.py` | Cinco combinaciones de señales aperiódicas intercambiando entrada y respuesta a impulso: conmutatividad, energía, potencia, verificación LTI y zona no afectada por el truncamiento | `resultados_etapa5.csv` y 5 figuras |
+| 6 | `etapa6.py` | Respuesta en frecuencia H(jω) de los cinco sistemas, en f0 y sus armónicos, y análisis escrito de todas las etapas | `respuesta_en_frecuencia.csv`, Figura 53 y `analisis_resultados.md` |
 
 ## Convenciones
 

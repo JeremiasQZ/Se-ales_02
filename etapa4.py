@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 from Señales import (periodicas, aperiodicas, t_x, t_h, dt, T0,
                      exp_decreciente, exp_creciente, impulso, escalon, sinc)
 from etapa3 import (energy, mean_power, convolve, power_window, valid_range,
-                    slug, FIRST_FIGURE)
+                    lti_errors, slug, FIRST_FIGURE)
 
 ROOT = Path(__file__).resolve().parent
 OUT_DIR = ROOT / "resultados" / "etapa4"
@@ -70,7 +70,8 @@ def scaling_rows():
         for h_name in RESPUESTAS:
             _, y, e_total, e_valid, power = output_metrics(x, modified_h(h_name))
             for a in A_VALUES:
-                _, y2, e2_total, e2_valid, power2 = output_metrics(x, modified_h(h_name, a=a))
+                h2 = modified_h(h_name, a=a)
+                _, y2, e2_total, e2_valid, power2 = output_metrics(x, h2)
                 rows.append({
                     "entrada": x_name,
                     "respuesta": h_name,
@@ -84,6 +85,7 @@ def scaling_rows():
                     "razon_energia": e2_total / e_total,
                     "razon_potencia": power2 / power,
                     "error_max": float(np.max(np.abs(y2 - a * y))),
+                    "error_lti": max(lti_errors(x, h2)),
                 })
     return rows
 
@@ -104,6 +106,8 @@ def print_scaling(rows):
                         for row in subset)
         print(f"  a={a}: a^2={a**2}, mayor desviación de E2/E y P2/P respecto de a^2 = {deviation:.1e}, "
               f"mayor max|y2-a*y| = {max(row['error_max'] for row in subset):.1e}")
+    print(f"  Mayor error LTI (aditividad, homogeneidad, invariancia) de los sistemas a*h: "
+          f"{max(row['error_lti'] for row in rows):.1e}")
 
 
 def shifting_rows():
@@ -154,6 +158,7 @@ def shifting_rows():
                     "error_max_total": float(np.max(np.abs(y3 - y_shifted))),
                     "error_max_comun": float(np.max(np.abs(y3[common] - y_shifted[common]))),
                     "error_inversion": inversion,
+                    "error_lti": max(lti_errors(x, h3)),
                 })
     return rows
 
@@ -173,6 +178,8 @@ def print_shifting(rows):
               f"{row['error_max_total']:10.1e}{row['error_max_comun']:10.1e}{inversion}")
     print(f"  Mayor error en la zona común: {max(row['error_max_comun'] for row in rows):.1e}")
     print(f"  Mayor |P3 - P|: {max(abs(row['potencia_desplazada'] - row['potencia_original']) for row in rows):.1e}")
+    print(f"  Mayor error LTI (aditividad, homogeneidad, invariancia) de los sistemas h(t - t0): "
+          f"{max(row['error_lti'] for row in rows):.1e}")
 
 
 def plot_case(number, x_name, x, h_name, h, h_mod, description, tag, shift=0):
